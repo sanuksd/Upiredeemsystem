@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UPI Coupon Redemption</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            max-width: 500px;
+            margin: auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #218838;
+        }
+        .message {
+            padding: 10px;
+            margin-top: 20px;
+            display: none;
+        }
+        .error {
+            color: red;
+            background-color: #f8d7da;
+        }
+        .success {
+            color: green;
+            background-color: #d4edda;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>UPI Coupon Redemption</h2>
+        <p>Enter your coupon code to redeem your offer:</p>
+        
+        <input type="text" id="couponCode" placeholder="Enter coupon code" />
+        <button onclick="redeemCoupon()">Redeem</button>
+
+        <div id="message" class="message"></div>
+        
+        <div id="upiForm" style="display:none;">
+            <p>Enter your UPI address to redeem:</p>
+            <input type="text" id="upiAddress" placeholder="Enter UPI address" />
+            <button onclick="redeemUPI()">Submit UPI Address</button>
+        </div>
+    </div>
+
+    <script>
+        function redeemCoupon() {
+            const couponCode = document.getElementById('couponCode').value;
+            const messageDiv = document.getElementById('message');
+            
+            if (!couponCode) {
+                messageDiv.textContent = 'Please enter a coupon code!';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            // Allow the user to enter UPI address if coupon is entered
+            messageDiv.textContent = 'Coupon entered! Now enter your UPI address.';
+            messageDiv.className = 'message success';
+            messageDiv.style.display = 'block';
+            document.getElementById('upiForm').style.display = 'block';
+        }
+
+        function redeemUPI() {
+            const upiAddress = document.getElementById('upiAddress').value;
+            const couponCode = document.getElementById('couponCode').value;
+            const messageDiv = document.getElementById('message');
+
+            if (!upiAddress || !couponCode) {
+                messageDiv.textContent = 'Please enter a valid UPI address!';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+                return;
+            }
+
+            fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {  // Replace with your Google Apps Script URL
+                method: "POST",
+                body: JSON.stringify({ upi: upiAddress, coupon: couponCode }),
+                headers: { "Content-Type": "application/json" }
+            })
+            .then(response => response.json())
+            .then(data => {
+                messageDiv.textContent = data.message;
+                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+                messageDiv.style.display = 'block';
+
+                if (data.status === "success") {
+                    localStorage.setItem('redeemed', 'true');
+                    document.getElementById('upiForm').style.display = 'none';
+                }
+            })
+            .catch(error => {
+                messageDiv.textContent = 'Error processing request!';
+                messageDiv.className = 'message error';
+                messageDiv.style.display = 'block';
+            });
+        }
+    </script>
+
+</body>
+</html>
