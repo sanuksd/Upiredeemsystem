@@ -89,38 +89,46 @@
         }
 
         function redeemUPI() {
-            const upiAddress = document.getElementById('upiAddress').value;
-            const couponCode = document.getElementById('couponCode').value;
-            const messageDiv = document.getElementById('message');
+    const upiAddress = document.getElementById('upiAddress').value;
+    const couponCode = document.getElementById('couponCode').value;
+    const messageDiv = document.getElementById('message');
 
-            if (!upiAddress || !couponCode) {
-                messageDiv.textContent = 'Please enter a valid UPI address!';
-                messageDiv.className = 'message error';
-                messageDiv.style.display = 'block';
-                return;
-            }
+    if (!upiAddress || !couponCode) {
+        messageDiv.textContent = 'Please enter a valid UPI address!';
+        messageDiv.className = 'message error';
+        messageDiv.style.display = 'block';
+        return;
+    }
 
-            fetch("https://script.google.com/macros/s/AKfycbwOPY5JqjO_Fqtr9OURSzefk_8Ww4DuMbCqYwoWQjQ0uVEF1Ht0vwkFzzsMm7tmBVYZ/exec", {  // Replace with your Google Apps Script URL
-                method: "POST",
-                body: JSON.stringify({ upi: upiAddress, coupon: couponCode }),
-                headers: { "Content-Type": "application/json" }
-            })
-            .then(response => response.json())
-            .then(data => {
-                messageDiv.textContent = data.message;
-                messageDiv.className = data.status === "success" ? 'message success' : 'message error';
-                messageDiv.style.display = 'block';
+    fetch("https://script.google.com/macros/s/AKfycbwOPY5JqjO_Fqtr9OURSzefk_8Ww4DuMbCqYwoWQjQ0uVEF1Ht0vwkFzzsMm7tmBVYZ/exec", {
+        method: "POST",
+        body: JSON.stringify({ upi: upiAddress, coupon: couponCode }),
+        headers: { "Content-Type": "application/json" }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log(data);  // Log the server response for debugging
 
-                if (data.status === "success") {
-                    localStorage.setItem('redeemed', 'true');
-                    document.getElementById('upiForm').style.display = 'none';
-                }
-            })
-            .catch(error => {
-                messageDiv.textContent = 'Error processing request!';
-                messageDiv.className = 'message error';
-                messageDiv.style.display = 'block';
-            });
+        messageDiv.textContent = data.message || 'Something went wrong!';
+        messageDiv.className = data.status === "success" ? 'message success' : 'message error';
+        messageDiv.style.display = 'block';
+
+        if (data.status === "success") {
+            localStorage.setItem('redeemed', 'true');
+            document.getElementById('upiForm').style.display = 'none';
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);  // Log the error
+        messageDiv.textContent = 'Error processing request! Please try again.';
+        messageDiv.className = 'message error';
+        messageDiv.style.display = 'block';
+    });
         }
     </script>
 
