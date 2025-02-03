@@ -4,8 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupon Redemption</title>
+
+    <!-- ✅ Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+
+    <!-- ✅ Load script.js after Firebase -->
+    <script src="script.js" defer></script>
+
     <style>
         body {
             text-align: center;
@@ -47,8 +53,6 @@
         <input type="text" id="upiInput" placeholder="Enter UPI ID">
         <button onclick="saveUPI()">Submit</button>
     </div>
-
-    <script src="script.js"></script>
 
 </body>
 </html>
