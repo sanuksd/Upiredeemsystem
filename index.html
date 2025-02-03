@@ -3,132 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UPI Coupon Redemption</title>
+    <title>Coupon Redemption</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
     <style>
         body {
+            text-align: center;
             font-family: Arial, sans-serif;
-            margin: 50px;
-            background-color: #f4f4f4;
+            margin-top: 50px;
         }
-        .container {
-            max-width: 500px;
-            margin: auto;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        input[type="text"] {
-            width: 100%;
+        #couponInput {
+            background-color: green;
+            color: white;
+            font-size: 18px;
             padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
             border-radius: 5px;
+            text-align: center;
+            border: none;
         }
         button {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #218838;
-        }
-        .message {
+            font-size: 18px;
             padding: 10px;
-            margin-top: 20px;
+            margin: 10px;
+            cursor: pointer;
+            border: none;
+            background-color: blue;
+            color: white;
+            border-radius: 5px;
+        }
+        #upiSection {
             display: none;
-        }
-        .error {
-            color: red;
-            background-color: #f8d7da;
-        }
-        .success {
-            color: green;
-            background-color: #d4edda;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <h2>UPI Coupon Redemption</h2>
-        <p>Enter your coupon code to redeem your offer:</p>
-        
-        <input type="text" id="couponCode" placeholder="Enter coupon code" />
-        <button onclick="redeemCoupon()">Redeem</button>
+    <h2>Enter Your Coupon Code</h2>
+    <input type="text" id="couponInput" placeholder="Enter Coupon Code">
+    <button onclick="validateCoupon()">Validate</button>
 
-        <div id="message" class="message"></div>
-        
-        <div id="upiForm" style="display:none;">
-            <p>Enter your UPI address to redeem:</p>
-            <input type="text" id="upiAddress" placeholder="Enter UPI address" />
-            <button onclick="redeemUPI()">Submit UPI Address</button>
-        </div>
+    <div id="upiSection">
+        <h2>Enter Your UPI ID</h2>
+        <input type="text" id="upiInput" placeholder="Enter UPI ID">
+        <button onclick="saveUPI()">Submit</button>
     </div>
 
-    <script>
-    function redeemCoupon() {
-        const couponCode = document.getElementById('couponCode').value;
-        const messageDiv = document.getElementById('message');
-        
-        if (!couponCode) {
-            messageDiv.textContent = 'Please enter a coupon code!';
-            messageDiv.className = 'message error';
-            messageDiv.style.display = 'block';
-            return;
-        }
-
-        // Allow the user to enter UPI address if coupon is entered
-        messageDiv.textContent = 'Coupon entered! Now enter your UPI address.';
-        messageDiv.className = 'message success';
-        messageDiv.style.display = 'block';
-        document.getElementById('upiForm').style.display = 'block';
-    }
-
-    function redeemUPI() {
-        const upiAddress = document.getElementById('upiAddress').value;
-        const couponCode = document.getElementById('couponCode').value;
-        const messageDiv = document.getElementById('message');
-
-        if (!upiAddress || !couponCode) {
-            messageDiv.textContent = 'Please enter a valid UPI address!';
-            messageDiv.className = 'message error';
-            messageDiv.style.display = 'block';
-            return;
-        }
-
-        fetch("https://script.google.com/macros/s/AKfycbxB2V7aOGc6gdOhVA70liNhg_Z-6NuUQpEGGu8MCErvBflDa2jg-yVYLqmoy7m5DyH2QQ/exec", {
-            method: "POST",
-            body: JSON.stringify({ upi: upiAddress, coupon: couponCode }),
-            headers: { "Content-Type": "application/json" }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            messageDiv.textContent = data.message || 'Something went wrong!';
-            messageDiv.className = data.status === "success" ? 'message success' : 'message error';
-            messageDiv.style.display = 'block';
-
-            if (data.status === "success") {
-                localStorage.setItem('redeemed', 'true');
-                document.getElementById('upiForm').style.display = 'none';
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            messageDiv.textContent = 'Error processing request! Please try again.';
-            messageDiv.className = 'message error';
-            messageDiv.style.display = 'block';
-        });
-    }
-    </script>
+    <script src="script.js"></script>
 
 </body>
 </html>
