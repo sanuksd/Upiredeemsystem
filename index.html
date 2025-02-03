@@ -100,7 +100,7 @@
                 return;
             }
 
-            fetch("YOUR_GOOGLE_APPS_SCRIPT_URL", {  // Replace with your Google Apps Script URL
+            fetch("https://script.google.com/macros/s/AKfycbwOPY5JqjO_Fqtr9OURSzefk_8Ww4DuMbCqYwoWQjQ0uVEF1Ht0vwkFzzsMm7tmBVYZ/exec", {  // Replace with your Google Apps Script URL
                 method: "POST",
                 body: JSON.stringify({ upi: upiAddress, coupon: couponCode }),
                 headers: { "Content-Type": "application/json" }
