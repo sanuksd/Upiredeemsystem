@@ -5,38 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coupon Redemption</title>
 
-    <!-- ✅ Firebase SDK -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-analytics.js"></script>
 
     <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-            margin-top: 50px;
-        }
-        #couponInput {
-            background-color: green;
-            color: white;
-            font-size: 18px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            border: none;
-        }
-        button {
-            font-size: 18px;
-            padding: 10px;
-            margin: 10px;
-            cursor: pointer;
-            border: none;
-            background-color: blue;
-            color: white;
-            border-radius: 5px;
-        }
-        #upiSection {
-            display: none;
-        }
+        body { text-align: center; font-family: Arial, sans-serif; margin-top: 50px; }
+        #couponInput { background-color: green; color: white; font-size: 18px; padding: 10px; border-radius: 5px; text-align: center; border: none; }
+        button { font-size: 18px; padding: 10px; margin: 10px; cursor: pointer; border: none; background-color: blue; color: white; border-radius: 5px; }
+        #upiSection { display: none; }
     </style>
 </head>
 <body>
@@ -52,78 +30,66 @@
     </div>
 
     <script>
-        console.log("✅ Script is running!");
-
-        // ✅ Firebase Configuration
+        // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyA8J0Cki_dZI6XOetq4CwY7Je23qAMgO2c",
             authDomain: "upiredeeem.firebaseapp.com",
             projectId: "upiredeeem",
             storageBucket: "upiredeeem.appspot.com",
             messagingSenderId: "777635310605",
-            appId: "1:777635310605:web:your-app-id"  // Replace with actual Firebase App ID
+            appId: "1:777635310605:web:814b86e4ec25fc70cf7944",
+            measurementId: "G-GR4EWLMJ79"
         };
 
-        // ✅ Initialize Firebase
+        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
+        firebase.analytics();
         const db = firebase.firestore();
 
         async function validateCoupon() {
-            let couponCode = document.getElementById("couponInput").value.trim().toUpperCase();
-
-            if (!couponCode) {
-                alert("⚠️ Please enter a coupon code!");
+            const couponCode = document.getElementById("couponInput").value.trim();
+            if (couponCode === "") {
+                alert("Please enter a coupon code.");
                 return;
             }
 
             try {
-                let couponRef = db.collection("coupons").doc(couponCode);
-                let doc = await couponRef.get();
-
+                const doc = await db.collection("coupons").doc(couponCode).get();
                 if (doc.exists) {
-                    let couponData = doc.data();
-
-                    if (couponData.used) {
-                        alert("❌ This coupon has already been used!");
+                    const data = doc.data();
+                    if (data.redeemed) {
+                        alert("This coupon has already been used.");
                     } else {
-                        alert("✅ Coupon is valid! Now enter your UPI.");
-                        document.getElementById("upiSection").style.display = "block"; // Show UPI input
+                        alert("Coupon is valid!");
+                        document.getElementById("upiSection").style.display = "block";
                     }
                 } else {
-                    alert("❌ Invalid coupon code!");
+                    alert("Invalid coupon code.");
                 }
             } catch (error) {
-                console.error("🚨 Error validating coupon:", error);
-                alert("❌ Error connecting to database! Check Firebase setup.");
+                console.error("Error validating coupon:", error);
+                alert("An error occurred. Please try again.");
             }
         }
 
         async function saveUPI() {
-            let couponCode = document.getElementById("couponInput").value.trim().toUpperCase();
-            let upiID = document.getElementById("upiInput").value.trim();
+            const couponCode = document.getElementById("couponInput").value.trim();
+            const upiID = document.getElementById("upiInput").value.trim();
 
-            if (!upiID) {
-                alert("⚠️ Please enter a valid UPI ID.");
+            if (upiID === "") {
+                alert("Please enter a valid UPI ID.");
                 return;
             }
 
             try {
-                let couponRef = db.collection("coupons").doc(couponCode);
-                let doc = await couponRef.get();
-
-                if (doc.exists && !doc.data().used) {
-                    await couponRef.update({
-                        used: true,
-                        upi: upiID
-                    });
-                    alert("✅ UPI saved successfully! This coupon is now used.");
-                    document.getElementById("upiSection").style.display = "none"; // Hide UPI input
-                } else {
-                    alert("❌ Error: Coupon not found or already used.");
-                }
+                await db.collection("coupons").doc(couponCode).update({
+                    upiID: upiID,
+                    redeemed: true
+                });
+                alert("UPI ID saved successfully!");
             } catch (error) {
-                console.error("🚨 Error saving UPI:", error);
-                alert("❌ Error connecting to database!");
+                console.error("Error saving UPI ID:", error);
+                alert("An error occurred. Please try again.");
             }
         }
     </script>
